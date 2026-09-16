@@ -1,0 +1,15 @@
+{% load static %}
+<div class="cards" data-name="p-{{ item.id }}">
+    <img src="{{ item.image_url }}" alt="{{ item.name }}">
+
+    <button class="heart-btn {% if item.id in favorite_ids %}active{% endif %}"
+            onclick="toggleHeart(this, {{ item.id }})">
+        <i class="fa-{% if item.id in favorite_ids %}solid{% else %}regular{% endif %} fa-heart"></i>
+    </button>
+
+    <div class="details" data-name="p-{{ item.id }}">
+        <h4>{{ item.name }}</h4>
+        <p>{{ item.description }}</p>
+        <h3>Rs.{{ item.price|floatformat:0 }}</h3>
+    </div>
+</div>

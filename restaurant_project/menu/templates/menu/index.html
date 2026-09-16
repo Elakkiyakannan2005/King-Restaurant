@@ -1,0 +1,283 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant</title>
+    <link rel="stylesheet" href="{% static 'menu/restaurant.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body data-authenticated="{{ request.user.is_authenticated|yesno:'true,false' }}">
+
+<!-- /////////////---Home------//////////////////////////////////////////////// -->
+<div class="main" id="home">
+
+    <img src="{% static 'menu/images/background.jpg' %}" alt="">
+    <div class="black"></div>
+
+    <div class="info">
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#menu">Menu</a>
+            <a href="#contact">Contact</a>
+
+            {% if request.user.is_authenticated %}
+                <a href="#" onclick="handleLogout(event)">Logout ({{ request.user.username }})</a>
+            {% else %}
+                <a href="#" onclick="openLoginCard(event)">Login</a>
+            {% endif %}
+
+            <div class="logo">
+                <img class="image1" src="{% static 'menu/images/logo.png' %}" alt="">
+            </div>
+        </nav>
+    </div>
+
+    <div class="head">
+        <h1>AUTHENTIC</h1>
+        <h2>INDIAN FOOD</h2>
+        <h5>A Journey through the Rich Flavors and Traditions of India</h5>
+    </div>
+
+    <!-- Login / Sign up Card -->
+    <div class="login-card" id="login-card">
+        <i class="fa-solid fa-xmark" onclick="closeLoginCard()" style="cursor:pointer;float:right;"></i>
+
+        <!-- LOGIN FORM -->
+        <form id="login-form" onsubmit="handleLogin(event)">
+            <h2>Login</h2>
+            <p>Welcome Back!</p>
+            {% csrf_token %}
+
+            <div id="login-error" class="form-error" style="color:#ff6b6b;display:none;"></div>
+
+            <div class="input-box">
+                <input type="text" name="username" placeholder="Username or Email" required>
+            </div>
+
+            <div class="input-box">
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+
+            <div class="options">
+                <label>
+                    <input type="checkbox"> Remember me
+                </label>
+                <a href="#">Forgot Password?</a>
+            </div>
+
+            <button type="submit">Login</button>
+
+            <p class="signup">
+                Don't have an account?
+                <a href="#" onclick="showSignupForm(event)">Sign Up</a>
+            </p>
+        </form>
+
+        <!-- SIGN UP FORM -->
+        <form id="signup-form" onsubmit="handleSignup(event)" style="display:none;">
+            <h2>Sign Up</h2>
+            <p>Create your account</p>
+            {% csrf_token %}
+
+            <div id="signup-error" class="form-error" style="color:#ff6b6b;display:none;"></div>
+
+            <div class="input-box">
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+            <div class="input-box">
+                <input type="email" name="email" placeholder="Email" required>
+            </div>
+            <div class="input-box">
+                <input type="password" name="password1" placeholder="Password" required>
+            </div>
+            <div class="input-box">
+                <input type="password" name="password2" placeholder="Confirm Password" required>
+            </div>
+
+            <button type="submit">Sign Up</button>
+
+            <p class="signup">
+                Already have an account?
+                <a href="#" onclick="showLoginForm(event)">Login</a>
+            </p>
+        </form>
+    </div>
+
+</div>
+
+<!-- ////////////////////////  About us  /////////////////////////////// -->
+<div class="about" id="about">
+    <video autoplay loop muted>
+        <source src="{% static 'menu/images/floor_effects_fog_from_left_03(720p).mp4' %}" type="video/mp4">
+    </video>
+
+    <img src="{% static 'menu/images/about_chif-removebg-preview.png' %}" alt="">
+
+    <div class="innerbox">
+        <div class="about_details">
+            <h1>About Us</h1>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum corrupti velit quas deserunt expedita
+                numquam ullam ipsa animi officia perspiciatis? Lorem, ipsum dolor sit amet consectetur adipisicing
+                elit. Veritatis eligendi error eum iure molestiae delectus suscipit minus, quas quasi temporibus
+                nobis ex dolore fugiat cumque? Dolorum suscipit iste voluptate cupiditate!</p>
+        </div>
+    </div>
+</div>
+
+<!-- /////-----Menu-----///////////////////////////////////////////////////////// -->
+<div class="menu" id="menu">
+    <div class="orange">
+        <div class="head_menu">
+            <img src="{% static 'menu/images/cheif.png' %}" alt="">
+            <h1>Order our best food options</h1>
+        </div>
+        <div class="info_menu">
+            <button class="tab active" onclick="show_tab('veg-container', this)">Veg Items</button>
+            <button class="tab" onclick="show_tab('non-veg-container', this)">Non-Veg Items</button>
+            <button class="tab" onclick="show_tab('favorites', this)">My Favorites</button>
+            <button class="tab" onclick="show_tab('my-orders', this)">My Orders</button>
+        </div>
+    </div>
+
+    <!-- VEG CONTAINER -->
+    <div id="veg-container" class="tab-container active">
+        {% for item in veg_items %}
+            {% include "menu/_card.html" %}
+        {% empty %}
+            <p>No veg items yet — add some from the Django admin.</p>
+        {% endfor %}
+    </div>
+
+    <!-- NON-VEG CONTAINER -->
+    <div id="non-veg-container" class="tab-container">
+        {% for item in non_veg_items %}
+            {% include "menu/_card.html" %}
+        {% empty %}
+            <p>No non-veg items yet — add some from the Django admin.</p>
+        {% endfor %}
+    </div>
+
+    <!-- FAVORITES -->
+    <div id="favorites" class="tab-container">
+        {% if not request.user.is_authenticated %}
+            <p>Please <a href="#" onclick="openLoginCard(event)">log in</a> to see your favorites.</p>
+        {% elif favorite_items %}
+            {% for item in favorite_items %}
+                {% include "menu/_card.html" %}
+            {% endfor %}
+        {% else %}
+            <p>You haven't favorited anything yet. Tap the heart on a dish to add it here.</p>
+        {% endif %}
+    </div>
+
+    <!-- MY ORDERS -->
+    <div id="my-orders" class="tab-container">
+        {% if not request.user.is_authenticated %}
+            <p>Please <a href="#" onclick="openLoginCard(event)">log in</a> to see your orders.</p>
+        {% elif orders %}
+            <table class="orders-table">
+                <thead>
+                    <tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th>Status</th><th>Placed</th></tr>
+                </thead>
+                <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.menu_item.name }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>Rs.{{ order.price_at_order|floatformat:0 }}</td>
+                        <td>Rs.{{ order.total_price|floatformat:0 }}</td>
+                        <td>{{ order.get_status_display }}</td>
+                        <td>{{ order.created_at|date:"d M Y, H:i" }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>You haven't placed any orders yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- PRODUCT PREVIEW / ORDER POPUPS (one per item, veg + non-veg) -->
+    <div class="products-preview">
+        {% for item in all_items %}
+            <div class="preview" data-target="p-{{ item.id }}">
+                <i class="fa-solid fa-xmark"></i>
+                <img src="{{ item.image_url }}" alt="{{ item.name }}">
+                <h3>{{ item.name }}</h3>
+                <p><input type="number" id="qty-{{ item.id }}" value="1" min="1"></p>
+                <div class="price">Rs.{{ item.price|floatformat:0 }}</div>
+                <div class="button">
+                    <button onclick="order_submit({{ item.id }})" class="buy">Order Now</button>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<!-- ------------ Contacts ---------------->
+<div class="contact" id="contact">
+
+    <div class="company_details">
+        <h3>Direct Contact</h3>
+
+        <nav class="company_email">
+            <img src="{% static 'menu/images/email.png' %}" alt="">
+            <label>E-MAIL</label>
+            <p>kannangopalraj1106@gmail.com</p>
+        </nav>
+
+        <nav class="company_contact">
+            <img src="{% static 'menu/images/mobil num.png' %}" alt="">
+            <label>PHONE</label>
+            <p>9361082509</p>
+        </nav>
+
+        <nav class="company_location">
+            <img src="{% static 'menu/images/location.png' %}" alt="">
+            <label>LOCATION</label>
+            <p>Tenkasi, Tamil Nadu, India.</p>
+        </nav>
+    </div>
+
+    <!-- customer details -->
+    {% if messages %}
+        {% for message in messages %}
+            <p class="form-message">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form class="customer_details" method="post" action="{% url 'contact' %}">
+        {% csrf_token %}
+        <nav class="name"><label>Your Name</label><br><input type="text" name="name" required></nav>
+        <nav class="email"><label>E-mail</label><br><input type="email" name="email" required></nav>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div class="inner_contact">
+        <p>All content Copyright &copy; AUTHENTIC INDIAN.com, Inc 2026 or their respective owners where indicated.</p>
+
+        <nav class="logoes">
+            <img src="{% static 'menu/images/instagram.png' %}" alt="instagram" title="instagram">
+            <img src="{% static 'menu/images/youtube.png' %}" alt="" title="youtube">
+            <img src="{% static 'menu/images/email.png' %}" alt="" title="email">
+            <img src="{% static 'menu/images/facebook.png' %}" alt="" title="facebook">
+        </nav>
+    </div>
+</div>
+
+<script>
+    // URLs generated server-side so restaurant.js doesn't need to hard-code them.
+    const API_URLS = {
+        login: "{% url 'login' %}",
+        signup: "{% url 'signup' %}",
+        logout: "{% url 'logout' %}",
+        placeOrder: "{% url 'place_order' %}",
+    };
+</script>
+<script src="{% static 'menu/restaurant.js' %}"></script>
+</body>
+</html>
