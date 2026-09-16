@@ -32,6 +32,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -93,7 +94,7 @@ USE_TZ = True
 # STATIC & MEDIA FILES
 # ------------------------------------------------------------------
 STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "menu" / "static"]
+# STATICFILES_DIRS = [BASE_DIR / "menu" / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"  # used by collectstatic in production
 
 MEDIA_URL = "media/"
