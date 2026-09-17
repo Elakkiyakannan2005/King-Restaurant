@@ -18,7 +18,7 @@ SECRET_KEY = "django-insecure-change-this-secret-key-before-deploying"
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost","king-restaurant-1.onrender.com",".onrender.com"]
 
 # ------------------------------------------------------------------
 # APPLICATIONS
