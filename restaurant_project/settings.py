@@ -12,13 +12,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ------------------------------------------------------------------
 # SECURITY
 # ------------------------------------------------------------------
-# NOTE: For a real deployment, move this into an environment variable
-# and set DEBUG = False, plus a proper ALLOWED_HOSTS list.
-SECRET_KEY = "django-insecure-change-this-secret-key-before-deploying"
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-change-this-secret-key-before-deploying"
+)
 
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", ".onrender.com"]
 
 # ------------------------------------------------------------------
 # APPLICATIONS
@@ -66,13 +66,13 @@ WSGI_APPLICATION = "restaurant_project.wsgi.application"
 ASGI_APPLICATION = "restaurant_project.asgi.application"
 
 # ------------------------------------------------------------------
-# DATABASE  (SQLite by default - swap for Postgres/MySQL in production)
+# DATABASE
 # ------------------------------------------------------------------
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+    )
 }
 
 # ------------------------------------------------------------------
@@ -99,6 +99,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 # STATICFILES_DIRS = [BASE_DIR / "menu" / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"  # used by collectstatic in production
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
